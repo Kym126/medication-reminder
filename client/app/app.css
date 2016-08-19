@@ -53,3 +53,99 @@
   height: 150px;
   box-shadow: 0px 5px 10px #888888;
 }
+
+.date{
+  background-color: #fff;
+  float: left;
+  width: 45%;
+  text-align: center;
+  padding: 5px;
+  padding-bottom: 0px;
+  padding-top: 10px;
+  font-size: 28px;
+  font-weight: 500;
+  border-radius: 10px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-top-right-radius: 0px;
+  position: relative;
+  color: #555;
+}
+
+.todo_container{
+  clear: left;
+  background-color: #fff;
+  width: 100%;
+  border-radius: 10px;
+  border-top-left-radius: 0px;
+  box-shadow: 0px 10px 10px #888888;
+  min-height: 500px;
+  max-height: 500px;
+  padding-top: 30px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.padding{
+    overflow: scroll;
+    height: 400px;
+}
+
+.triangle {
+  float: left;
+  position: relative;
+  left: 0px;
+  width: 0;
+  height: 0;
+  border-left: 25px solid #fff;
+  border-top:  25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 25px solid #fff;
+}
+
+.task{
+  width: 100%;
+  position: relative;
+  height: 200px;
+}
+
+.info{
+  width: 50%;
+  float: left;
+  padding: 20px;
+  font-size: 18px;
+  color: #333;
+}
+
+.complete_btn{
+  bottom: 0px;
+  width: 40%;
+  float: left;
+  position: absolute;
+  right: 15px;
+  text-align: center;
+  background-color: #ff9500;
+  border-radius: 3px;
+  padding: 8px;
+  height: 40px;
+  color: #fff;
+  font-size: 16px;
+  box-shadow: 0px 1px 2px #888888;
+  font-family: HelveticaNeue-Thin;
+}
+
+.right_side{
+  padding: 20px;
+  font-size: 18px;
+  color: #333;
+}
+
+.status{
+  background-color: #4393B9;
+  width: 30%;
+  font-size: 22px;
+  color: #fff;
+  text-align: left;
+  padding-left: 10px;
+  font-family: sans-serif;;
+}

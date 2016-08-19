@@ -13,19 +13,28 @@
 </header>
 <div class="container">
   <div class="row">
-    <div class="col-lg-6 col-lg-offset-3 text-center">
-      <button ng-click="increment()">
-        Increment
-      </button>
-      <button ng-click="decrement()">
-        decrement
-      </button>
-            <h1>{{currentDate}}</h1>
-        <div ng-repeat="m in meds">
-            {{m.time}} {{m.name}} {{m.dosage}}
+    <div style="background-color: #d1d1d1; width: 65%; margin-top: 50px;">
+      <div class="date">
+        <img ng-click="decrement()" src="../assets/images/left-arrow.png" style="height: 18px; position: absolute; top: 22px; left: 15px;">
+        {{currentDate}}
+        <img ng-click="increment()" src="../assets/images/left-arrow.png" style="height: 18px; position: absolute; top: 20px; right: 15px; transform:rotate(180deg)">
+      </div>
+      <div class="triangle"></div>
+      <div class="todo_container">
+        <div class="padding">
+          <div id="no_task" style="display: none; position: relative; font-size: 30px; color: #666; font-weight: 400; font-family: HelveticaNeue; top: 200px; left: 35%;"> No More Tasks</div>
+          <div class="task" ng-repeat="m in meds | orderBy:'time':false">
+            <hr ng-show="$index != 0" />
+            <div class="status"> {{m.time | cmdate:'h:mm:ss a'}}</div>
+            <div class="info">Name:&emsp;&emsp;{{m.name}}<br>Dosage:&emsp;{{m.dosage}}</div>
+            <div class="right_side">
+              Remarks:
+              <div class="complete_btn">COMPLETED</div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-  </div>
 </div>
 <footer class="footer">
   <div class="container">
