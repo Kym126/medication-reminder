@@ -37,3 +37,19 @@
     color: #000;
     padding: 0.2em 0;
 }
+
+.kym_nav{
+  background-color: #4393B9;
+  color: #fff;
+  border-bottom: 0;
+}
+
+.kym_nav .kym_nav_item{
+  color: #fff;
+}
+
+.kym_hero_unit{
+  background-image: url("../assets/images/morning_default.jpg");
+  height: 150px;
+  box-shadow: 0px 5px 10px #888888;
+}
