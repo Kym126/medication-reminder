@@ -8,6 +8,13 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-6 col-lg-offset-3 text-center">
+      <button ng-click="increment()">
+        Increment
+      </button>
+      <button ng-click="decrement()">
+        decrement
+      </button>
+            <h1>{{currentDate}}</h1>
         <div ng-repeat="m in meds">
             {{m.time}} {{m.name}} {{m.dosage}}
         </div>
