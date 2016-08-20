@@ -13,7 +13,7 @@
 </header>
 <div class="container">
   <div class="row">
-    <div style="background-color: #d1d1d1; width: 65%; margin-top: 50px;">
+    <div style="background-color: #d1d1d1; width: 65%; margin-top: 50px; float: left;">
       <div class="date">
         <img ng-click="decrement()" src="../assets/images/left-arrow.png" style="height: 18px; position: absolute; top: 22px; left: 15px;">
         {{currentDate}}
@@ -22,18 +22,21 @@
       <div class="triangle"></div>
       <div class="todo_container">
         <div class="padding">
-          <div id="no_task" style="display: none; position: relative; font-size: 30px; color: #666; font-weight: 400; font-family: HelveticaNeue; top: 200px; left: 35%;"> No More Tasks</div>
-          <div class="task" ng-repeat="m in meds | orderBy:'time':false">
+          <div class="task" ng-repeat="m in values = (meds | filter_after:isEnable | orderBy:'time':false) ">
             <hr ng-show="$index != 0" />
-            <div class="status"> {{m.time | cmdate:'h:mm:ss a'}}</div>
+            <div class="status" ng-style="set_bg_color(m)"> {{m.time | cmdate:'h:mm:ss a'}}</div>
             <div class="info">Name:&emsp;&emsp;{{m.name}}<br>Dosage:&emsp;{{m.dosage}}</div>
             <div class="right_side">
               Remarks:
-              <div class="complete_btn">COMPLETED</div>
+              <div ng-show="show_complete_btn(m.time)" class="complete_btn">COMPLETED</div>
             </div>
           </div>
+          <div ng-show="!values.length" style="position: relative; font-size: 30px; color: #666; font-weight: 400; font-family: HelveticaNeue; top: 200px; left: 35%;"> No More Tasks</div>
         </div>
       </div>
+    </div>
+    <div style="background-color: #d1d1d1; width: 35%; margin-top: 50px; float: left; position: relative">
+      <div class="missed_container"></div>
     </div>
 </div>
 <footer class="footer">
@@ -41,3 +44,5 @@
       <p>© 2016 Mavencare™, made with <span class="glyphicon glyphicon-heart heart-red"></span> for better healthcare.</p>
   </div>
 </footer>
+<audio id="alert" src="../assets/audio/alert.mp3" preload="auto"></audio>
+<audio id="buzzer" src="../assets/audio/late.mp3" preload="auto"></audio>
