@@ -1,10 +1,11 @@
 <div ng-include="'components/navbar/navbar.html'"></div>
-
+<div id= "sticky-anchor"></div>
 <header class="kym_hero_unit" id="banner">
-  <div class="container">
+  <div class="container" style="position: absolute;">
       <span style="float: left; color: #fff; font-family: HelveticaNeue; margin-top: 10px; margin-left: 25px;">
-        <h2>Goodmorning Kym</h2>
+        <h2>Goodmorning Kym!</h2>
         <div style="font-family: HelveticaNeue-Thin; font-size: 16px; float: left; margin-top: 5px; border: 1px #fff solid; padding: 5px; padding-left: 18px; padding-right: 18px; border-radius: 5px; color: #fff;">Call for Emergency</div>
+        <div id="notifs">{{message}}<div id="triangle"></div><div ng-click="close_notif()" id="close_btn"><img src="../assets/images/close.png" style="height: 7px;"></div></div>
       </span>
       <span style="float: right; margin-right: 90px; margin-top: 20px; text-align: right;">
         <h1>{{currentTime}}</h1>
@@ -25,10 +26,10 @@
           <div class="task" ng-repeat="m in values = (meds | filter_after:isEnable | orderBy:'time':false) ">
             <hr ng-show="$index != 0" />
             <div class="status" ng-style="set_bg_color(m)"> {{m.time | cmdate:'h:mm:ss a'}}</div>
-            <div class="info">Name:&emsp;&emsp;{{m.name}}<br>Dosage:&emsp;{{m.dosage}}</div>
+            <div class="info">Name:&emsp;&emsp;{{m.name}}<br>Dosage:&emsp;{{m.dosage}}<div ng-show="ctr == 0" class="check_btn">Alert Storage</div></div>
             <div class="right_side">
-              Remarks:
-              <div ng-show="show_complete_btn(m.time)" class="complete_btn">COMPLETED</div>
+              Special Instructions:
+              <div ng-show="show_complete_btn(m)" class="complete_btn">Completed</div>
             </div>
           </div>
           <div ng-show="!values.length" style="position: relative; font-size: 30px; color: #666; font-weight: 400; font-family: HelveticaNeue; top: 200px; left: 35%;"> No More Tasks</div>
