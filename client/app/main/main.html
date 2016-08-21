@@ -1,43 +1,78 @@
 <div ng-include="'components/navbar/navbar.html'"></div>
+
 <div id= "sticky-anchor"></div>
 <header class="kym_hero_unit" id="banner">
   <div class="container" style="position: absolute;">
-      <span style="float: left; color: #fff; font-family: HelveticaNeue; margin-top: 10px; margin-left: 25px;">
+      <span id="greeting">
         <h2>Goodmorning Kym!</h2>
-        <div style="font-family: HelveticaNeue-Thin; font-size: 16px; float: left; margin-top: 5px; border: 1px #fff solid; padding: 5px; padding-left: 18px; padding-right: 18px; border-radius: 5px; color: #fff;">Call for Emergency</div>
-        <div id="notifs">{{message}}<div id="triangle"></div><div ng-click="close_notif()" id="close_btn"><img src="../assets/images/close.png" style="height: 7px;"></div></div>
+        <div id="emergency_btn" style="">Call for Emergency</div>
+        <div id="notifs">{{message}}<div id="notifs_triangle"></div>
+          <div ng-click="close_notif()" id="close_btn">
+            <img src="../assets/images/close.png" style="height: 7px;">
+          </div>
+        </div>
       </span>
-      <span style="float: right; margin-right: 90px; margin-top: 20px; text-align: right;">
-        <h1>{{currentTime}}</h1>
+      <span id="date_time">
+        <h1>{{currentTime}}</h1>{{static_date}}
       </span>
   </div>
 </header>
 <div class="container">
   <div class="row">
-    <div style="background-color: #d1d1d1; width: 65%; margin-top: 50px; float: left;">
+    <div id="left_side">
       <div class="date">
-        <img ng-click="decrement()" src="../assets/images/left-arrow.png" style="height: 18px; position: absolute; top: 22px; left: 15px;">
+        <img class="arrow_img" ng-click="decrement()" src="../assets/images/left-arrow.png" style="height: 18px; position: absolute; top: 22px; left: 15px;">
         {{currentDate}}
         <img ng-click="increment()" src="../assets/images/left-arrow.png" style="height: 18px; position: absolute; top: 20px; right: 15px; transform:rotate(180deg)">
       </div>
-      <div class="triangle"></div>
-      <div class="todo_container">
-        <div class="padding">
+      <div id="todo_triangle"></div>
+      <div id="todo_container">
+        <div id="todo_padding">
           <div class="task" ng-repeat="m in values = (meds | filter_after:isEnable | orderBy:'time':false) ">
             <hr ng-show="$index != 0" />
             <div class="status" ng-style="set_bg_color(m)"> {{m.time | cmdate:'h:mm:ss a'}}</div>
-            <div class="info">Name:&emsp;&emsp;{{m.name}}<br>Dosage:&emsp;{{m.dosage}}<div ng-show="ctr == 0" class="check_btn">Alert Storage</div></div>
-            <div class="right_side">
+            <div class="info_left">
+              Medicine:&nbsp;&emsp;{{m.name}}
+              <br>
+              Dosage:&emsp;&emsp;{{m.dosage}}
+              <div ng-show="ctr == 0" class="check_btn">
+                Alert Storage
+              </div>
+            </div>
+            <div class="info_right">
               Special Instructions:
-              <div ng-show="show_complete_btn(m)" class="complete_btn">Completed</div>
+              <div ng-click="set_complete(m)" ng-show="show_complete_btn(m)" class="complete_btn">Completed</div>
             </div>
           </div>
-          <div ng-show="!values.length" style="position: relative; font-size: 30px; color: #666; font-weight: 400; font-family: HelveticaNeue; top: 200px; left: 35%;"> No More Tasks</div>
+          <div ng-show="!values.length" id="no_task"> No More Tasks</div>
         </div>
       </div>
     </div>
-    <div style="background-color: #d1d1d1; width: 35%; margin-top: 50px; float: left; position: relative">
-      <div class="missed_container"></div>
+    <div id="right_side">
+      <div id="miss_comp_container">
+        <div id="indicator_missed"></div>
+        <div id="indicator_completed"></div>
+        <div id="miss_title" ng-click="change_list(false)">
+          <img ng-src="{{miss_ic}}" style="height: 20px; margin-right: 5px; position: relative; top: -2px;">Missed
+        </div>
+        <div id="complete_title" ng-click="change_list(true)">
+          <img ng-src="{{complete_ic}}" style="height: 20px; margin-right: 5px; position: relative; top: -2px;">Completed
+        </div>
+        <br>
+        <hr id="divider">
+        <br>
+        <div id="miss_comp_list">
+          <div id="miss_comp_padding">
+            <div class="list_item_container" ng-repeat="m in values = (meds | filter_missed:isMiss | orderBy:'time':true )">
+              <div class="list_item">
+                <div class="time_info" ng-style="varying_colors($index, values.length)">{{m.time | cmdate:'h:mm:ss a'}}</div>
+                <div class="misc_info">{{m.name}}<br>{{m.dosage}}</div>
+              </div>
+              <hr ng-show="$index != values.length - 1">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 </div>
 <footer class="footer">

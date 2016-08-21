@@ -2,8 +2,24 @@
 
 angular.module('medicationReminderApp').controller('MainCtrl', function ($scope, $http, $window, $resource) {
 
+    //Variable Declarations
+
+    $scope.message = "";
+    $scope.audio = new Audio('../assets/audio/alert.mp3');
+    $scope.isShown = false;
+    $scope.time_start = new Date(moment());
+    $scope.static_date = moment().format('MMMM Do YYYY');
+    $scope.miss_ic = "../assets/images/miss_mark.png";
+    $scope.complete_ic = "../assets/images/complete_unmark.png";
+    $scope.isMiss = true;
+    $scope.currentTime = moment().format('h:mm:ss a');
+
     var start = moment().format('MM/DD/YYYY'),
-        end = moment().add(1, 'day').format('MM/DD/YYYY');
+        end = moment().add(1, 'day').format('MM/DD/YYYY'),
+        colors = Array("#F44336","#4CAF50", "#2196F3", "#FFC107"),
+        num_colors = 4;
+
+    //Initial Get of Data from server
 
     $http.get('/api/medications?start=' + start + '&end=' + end).then(function (meds) {
         $scope.meds = meds.data;
@@ -12,12 +28,58 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
         }
     });
 
-    $scope.message = "";
-    $scope.audio = new Audio('../assets/audio/alert.mp3');
+    //Handles Events in the Banner
+
+    $window.setInterval(function () {
+
+        //Update Clock
+        $scope.currentTime = moment().format('h:mm:ss a');
+        $scope.$apply();
+        var current = new Date(moment().subtract(1, 'minute'));
+
+        //Close notif if more than 1 minute open (for missed only)
+        if($scope.time_start < current && $scope.isShown == true){
+          $scope.close_notif();
+        }
+    }, 1000);
+
+    angular.element('#indicator_missed').css('transform', 'scale(1)');
+    angular.element('#indicator_completed').css('transform', 'scale(0)');
+
+    $scope.change_list = function(complete){
+      if(complete){
+        angular.element('#miss_title').css('color', '#dddddd');
+        angular.element('#complete_title').css('color', '#4CAF50');
+        $scope.miss_ic = "../assets/images/miss_unmark.png";
+        $scope.complete_ic = "../assets/images/complete_mark.png";
+        $scope.isMiss = false;
+        angular.element('#indicator_missed').css('transform', 'scale(0)');
+        angular.element('#indicator_missed').css('background-color', '#dddddd');
+        angular.element('#indicator_completed').css('transform', 'scale(1)');
+        angular.element('#indicator_completed').css('background-color', '#43A047');
+      }else{
+        angular.element('#miss_title').css('color', '#F44336');
+        angular.element('#complete_title').css('color', '#dddddd');
+        $scope.miss_ic = "../assets/images/miss_mark.png";
+        $scope.complete_ic = "../assets/images/complete_unmark.png";
+        $scope.isMiss = true;
+        angular.element('#indicator_missed').css('transform', 'scale(1)');
+        angular.element('#indicator_missed').css('background-color', '#E53935');
+        angular.element('#indicator_completed').css('transform', 'scale(0)');
+        angular.element('#indicator_completed').css('background-color', '#dddddd');
+      }
+    }
 
     $scope.close_notif = function(){
       $("#notifs").css("display", "none");
       $scope.audio.pause();
+      $scope.isShown = false;
+    }
+
+    $scope.varying_colors = function(i, length){
+      return {
+        "background-color": colors[(length-i)%num_colors]
+      }
     }
 
     function sticky_relocate() {
@@ -40,8 +102,35 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
     $('.kym_hero_unit').removeClass('stick');
     $('#sticky-anchor').height(0);
 
+    $scope.set_complete = function(m){
+      var data = {
+        completed: true,
+        d:{
+
+        }
+      }
+
+      $http({
+          method: 'PUT',
+          url: '/api/medications/' + m._id,
+          data: JSON.stringify(data)
+        })
+        .then(function (success) {
+        }, function (error) {
+          errorCallback(error.data);
+        });
+
+        $http.get('/api/medications?start=' + start + '&end=' + end).then(function (meds) {
+            $scope.meds = meds.data;
+            if($scope.meds.length == 0){
+              angular.element('#no_task' ).css('display', 'inline');
+            }
+        });
+    }
+
     var data = {
-      time: moment().add(5, 'seconds').format(),
+      time: moment().add(5, 'seconds'),
+      completed: false,
       d:{
 
       }
@@ -49,21 +138,20 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
 
     $http({
         method: 'PUT',
-        url: '/api/medications/57b6360aa141fb1988c436a0',
+        url: '/api/medications/57b6360aa141fb1988c436b6',
         data: JSON.stringify(data)
       })
       .then(function (success) {
-        callback(success);
       }, function (error) {
         errorCallback(error.data);
       });
 
-    $scope.currentTime = moment().format('h:mm:ss a');
-
-    $window.setInterval(function () {
-        $scope.currentTime = moment().format('h:mm:ss a');
-        $scope.$apply();
-    }, 1000);
+      $http.get('/api/medications?start=' + start + '&end=' + end).then(function (meds) {
+          $scope.meds = meds.data;
+          if($scope.meds.length == 0){
+            angular.element('#no_task' ).css('display', 'inline');
+          }
+      });
 
     $scope.ctr = 0;
     $scope.currentDate = "Today";
@@ -124,14 +212,17 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
           $scope.audio.pause();
           $scope.audio = new Audio('../assets/audio/alert.mp3');
           $scope.audio.play();
-          $scope.message= "Time to administer "+ m.name + ". Make sure to use only "+ m.dosage + ".";
+          $scope.message= "Time to administer "+ m.name + ". Make sure to only use "+ m.dosage + ". Also alert the storage if supplies is low.";
           $('#notifs').css('display', 'initial');
+          $scope.isShown = true;
         }else if(time_val >= late_l && time_val <= late){
           $scope.audio.pause();
           $scope.audio = new Audio('../assets/audio/late.mp3');
           $scope.audio.play();
           $scope.message= "Uh-Oh You forgot to administer "+ m.name + " by "+ moment(time_val).format('h:mm:ss a') + ".";
           $('#notifs').css('display', 'initial');
+          $scope.isShown = true;
+          $scope.time_start = time_val;
         }
 
         if(time_val >= late && time_val <= advance){
@@ -201,7 +292,7 @@ angular.module('medicationReminderApp').filter("filter_after", function() {
             var time = new Date(items[i].time),
                 current = new Date(moment().subtract(5, 'minutes').subtract(1, 'seconds'));
 
-            if (time >= current)  {
+            if (time >= current && items[i].completed == false)  {
                 result.push(items[i]);
             }
         }
@@ -209,5 +300,29 @@ angular.module('medicationReminderApp').filter("filter_after", function() {
       }else{
         return items;
       }
+  };
+});
+
+angular.module('medicationReminderApp').filter("filter_missed", function() {
+  return function(items, isMiss) {
+      var result = [];
+      if(isMiss){
+        for (var i=0; i<items.length; i++){
+            var time = new Date(items[i].time),
+                current = new Date(moment().subtract(5, 'minutes'));
+
+            if (time < current && items[i].completed == false)  {
+                result.push(items[i]);
+            }
+        }
+      }else{
+        for (var i=0; i<items.length; i++){
+
+            if (items[i].completed == true)  {
+                result.push(items[i]);
+            }
+        }
+      }
+      return result;
   };
 });
