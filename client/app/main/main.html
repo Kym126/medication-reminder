@@ -28,23 +28,25 @@
       <div id="todo_triangle"></div>
       <div id="todo_container">
         <div id="todo_padding">
-          <div class="task" ng-repeat="m in values = (meds | filter_after:isEnable | orderBy:'time':false) ">
-            <hr ng-show="$index != 0" />
-            <div class="status" ng-style="set_bg_color(m)"> {{m.time | cmdate:'h:mm:ss a'}}</div>
-            <div class="info_left">
-              Medicine:&nbsp;&emsp;{{m.name}}
-              <br>
-              Dosage:&emsp;&emsp;{{m.dosage}}
-              <div ng-show="ctr == 0" class="check_btn">
-                Alert Storage
+          <div class="task_wrapper" id="{{ 'to_do-' + $index }}" ng-repeat="m in to_do = (meds | filter_after:isEnable | orderBy:'time':false) ">
+            <div class="task">
+              <div class="status" ng-style="set_bg_color(m)"> {{m.time | cmdate:'h:mm:ss a'}}</div>
+              <div class="info_left">
+                Medicine:&nbsp;&emsp;{{m.name}}
+                <br>
+                Dosage:&emsp;&emsp;{{m.dosage}}
+                <div ng-show="ctr == 0" class="check_btn">
+                  Alert Storage
+                </div>
+              </div>
+              <div class="info_right">
+                Special Instructions:
+                <div ng-click="set_complete(m, to_do.length, $index, values.length)" ng-show="show_complete_btn(m, to_do.length, $index, values.length)" class="complete_btn">Completed</div>
               </div>
             </div>
-            <div class="info_right">
-              Special Instructions:
-              <div ng-click="set_complete(m)" ng-show="show_complete_btn(m)" class="complete_btn">Completed</div>
-            </div>
+            <hr ng-show="$index != to_do.length - 1"/>
           </div>
-          <div ng-show="!values.length" id="no_task"> No More Tasks</div>
+          <div ng-show="!to_do.length" id="no_task"> No More Tasks</div>
         </div>
       </div>
     </div>
@@ -55,7 +57,7 @@
         <div id="miss_title" ng-click="change_list(false)">
           <img ng-src="{{miss_ic}}" style="height: 20px; margin-right: 5px; position: relative; top: -2px;">Missed
         </div>
-        <div id="complete_title" ng-click="change_list(true)">
+        <div id="complete_title" ng-click="change_list(true, values.length)">
           <img ng-src="{{complete_ic}}" style="height: 20px; margin-right: 5px; position: relative; top: -2px;">Completed
         </div>
         <br>
@@ -63,7 +65,7 @@
         <br>
         <div id="miss_comp_list">
           <div id="miss_comp_padding">
-            <div class="list_item_container" ng-repeat="m in values = (meds | filter_missed:isMiss | orderBy:'time':true )">
+            <div class="list_item_container" id="{{ 'miss_comp-' + $index }}" ng-repeat="m in values = (meds | filter_missed:isMiss | orderBy:'time':true )">
               <div class="list_item">
                 <div class="time_info" ng-style="varying_colors($index, values.length)">{{m.time | cmdate:'h:mm:ss a'}}</div>
                 <div class="misc_info">{{m.name}}<br>{{m.dosage}}</div>
@@ -76,8 +78,9 @@
     </div>
 </div>
 <footer class="footer">
-  <div class="container">
+  <div class="container" style="text-align: right;">
       <p>© 2016 Mavencare™, made with <span class="glyphicon glyphicon-heart heart-red"></span> for better healthcare.</p>
+      <p>© Kym Derrick Uy (2016)</p>
   </div>
 </footer>
 <audio id="alert" src="../assets/audio/alert.mp3" preload="auto"></audio>

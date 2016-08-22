@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('medicationReminderApp').controller('MainCtrl', function ($scope, $http, $window, $resource) {
+angular.module('medicationReminderApp').controller('MainCtrl', function ($scope, $http, $window, $resource, $timeout) {
 
     //Variable Declarations
 
@@ -35,10 +35,11 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
         //Update Clock
         $scope.currentTime = moment().format('h:mm:ss a');
         $scope.$apply();
-        var current = new Date(moment().subtract(1, 'minute'));
+        var current = new Date(moment()),
+            late = new Date(moment($scope.time_start).add(6, 'minutes'));
 
         //Close notif if more than 1 minute open (for missed only)
-        if($scope.time_start < current && $scope.isShown == true){
+        if(late < current && $scope.isShown == true){
           $scope.close_notif();
         }
     }, 1000);
@@ -102,7 +103,7 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
     $('.kym_hero_unit').removeClass('stick');
     $('#sticky-anchor').height(0);
 
-    $scope.set_complete = function(m){
+    $scope.set_complete = function(m, length, index, complete_length){
       var data = {
         completed: true,
         d:{
@@ -120,16 +121,36 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
           errorCallback(error.data);
         });
 
-        $http.get('/api/medications?start=' + start + '&end=' + end).then(function (meds) {
+        var div_id = '#to_do-' + index;
+        angular.element('#to_do-0' ).css('opacity', '0');
+        if(!$scope.isMiss){
+          for(var i = 0; i < complete_length; i++){
+              div_id = '#miss_comp-' + i;
+              angular.element(div_id).css('transform', 'translateY(81px)');
+          }
+        }
+
+        $timeout(function(){
+          for(var i = 0; i < length; i++){
+            if(i > index){
+              div_id = '#to_do-' + i;
+              angular.element(div_id).css('transform', 'translateY(-239px)');
+            }
+          }
+        }, 500);
+
+        $timeout(function(){
+          $http.get('/api/medications?start=' + start + '&end=' + end).then(function (meds) {
             $scope.meds = meds.data;
             if($scope.meds.length == 0){
-              angular.element('#no_task' ).css('display', 'inline');
+              angular.element('#no_task').css('display', 'inline');
             }
-        });
+          });
+        }, 1500);
     }
 
     var data = {
-      time: moment().add(5, 'seconds'),
+      time: moment().subtract(55, 'seconds').subtract(4, 'minutes'),
       completed: false,
       d:{
 
@@ -149,7 +170,7 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
       $http.get('/api/medications?start=' + start + '&end=' + end).then(function (meds) {
           $scope.meds = meds.data;
           if($scope.meds.length == 0){
-            angular.element('#no_task' ).css('display', 'inline');
+            angular.element('#no_task').css('display', 'inline');
           }
       });
 
@@ -199,10 +220,11 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
       });
     }
 
-    $scope.show_complete_btn = function(m){
+    $scope.show_complete_btn = function(m, length, index, miss_length){
       var time_val = new Date(m.time),
           late = new Date(moment().subtract(5, 'minutes')),
-          late_l = new Date(moment().subtract(5, 'minutes').subtract(1, 'seconds')),
+          late_n = new Date(moment().subtract(5, 'minutes').subtract(1, 'seconds').subtract(50, 'milliseconds')),
+          late_l = new Date(moment().subtract(5, 'minutes').subtract(2, 'seconds').subtract(50, 'milliseconds')),
           advance = new Date(moment().add(5, 'minutes')),
           current = new Date(moment()),
           current_l = new Date(moment().subtract(1, 'seconds'));
@@ -215,7 +237,7 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
           $scope.message= "Time to administer "+ m.name + ". Make sure to only use "+ m.dosage + ". Also alert the storage if supplies is low.";
           $('#notifs').css('display', 'initial');
           $scope.isShown = true;
-        }else if(time_val >= late_l && time_val <= late){
+        }else if(time_val >= late_l && time_val <= late_n){
           $scope.audio.pause();
           $scope.audio = new Audio('../assets/audio/late.mp3');
           $scope.audio.play();
@@ -223,6 +245,35 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
           $('#notifs').css('display', 'initial');
           $scope.isShown = true;
           $scope.time_start = time_val;
+
+          var div_id = '#to_do-' + index;
+          angular.element('#to_do-0' ).css('opacity', '0');
+
+          if($scope.isMiss){
+            for(var i = 0; i < miss_length; i++){
+                div_id = '#miss_comp-' + i;
+                angular.element(div_id).css('transform', 'translateY(81px)');
+            }
+          }
+
+          $timeout(function(){
+            for(var i = 0; i < length; i++){
+              if(i > index){
+                div_id = '#to_do-' + i;
+                angular.element(div_id).css('transform', 'translateY(-239px)');
+              }
+            }
+          }, 500);
+
+          $timeout(function(){
+            $http.get('/api/medications?start=' + start + '&end=' + end).then(function (meds) {
+              $scope.meds = meds.data;
+              if($scope.meds.length == 0){
+                angular.element('#no_task').css('display', 'inline');
+              }
+            });
+          }, 1300);
+
         }
 
         if(time_val >= late && time_val <= advance){
@@ -290,7 +341,7 @@ angular.module('medicationReminderApp').filter("filter_after", function() {
         var result = [];
         for (var i=0; i<items.length; i++){
             var time = new Date(items[i].time),
-                current = new Date(moment().subtract(5, 'minutes').subtract(1, 'seconds'));
+                current = new Date(moment().subtract(5, 'minutes').subtract(2, 'seconds'));
 
             if (time >= current && items[i].completed == false)  {
                 result.push(items[i]);
@@ -309,7 +360,7 @@ angular.module('medicationReminderApp').filter("filter_missed", function() {
       if(isMiss){
         for (var i=0; i<items.length; i++){
             var time = new Date(items[i].time),
-                current = new Date(moment().subtract(5, 'minutes'));
+                current = new Date(moment().subtract(5, 'minutes').subtract(3, 'seconds').subtract(20, 'milliseconds'));
 
             if (time < current && items[i].completed == false)  {
                 result.push(items[i]);
