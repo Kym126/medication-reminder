@@ -187,7 +187,8 @@
 }
 
 #todo_padding{
-    overflow: scroll;
+    overflow-y: : scroll;
+    overflow-x: hidden;
     height: 400px;
 }
 
@@ -380,15 +381,13 @@
 }
 
 #miss_comp_padding{
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
   height: 430px;
 }
 
 .list_item_container{
   transition: transform .5s, opacity 1s;
-}
-
-#miss_comp-0{
 }
 
 .list_item{
