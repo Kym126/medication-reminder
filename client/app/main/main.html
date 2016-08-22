@@ -4,7 +4,7 @@
 <header class="kym_hero_unit" id="banner">
   <div class="container" style="position: absolute;">
       <span id="greeting">
-        <h2>Goodmorning Kym!</h2>
+        <h2>{{greeting_text}} {{user_name}}!</h2>
         <div id="emergency_btn" style="">Call for Emergency</div>
         <div id="notifs">{{message}}<div id="notifs_triangle"></div>
           <div ng-click="close_notif()" id="close_btn">
@@ -42,6 +42,7 @@
               <div class="info_right">
                 Special Instructions:
                 <div ng-click="set_complete(m, to_do.length, $index, values.length)" ng-show="show_complete_btn(m, to_do.length, $index, values.length)" class="complete_btn">Completed</div>
+                <div class="status_box" ng-style="change_text_color(m.completed)" ng-show="ctr < 0" class="complete_btn">{{status_text}}</div>
               </div>
             </div>
             <hr ng-show="$index != to_do.length - 1"/>
@@ -65,7 +66,7 @@
         <br>
         <div id="miss_comp_list">
           <div id="miss_comp_padding">
-            <div class="list_item_container" id="{{ 'miss_comp-' + $index }}" ng-repeat="m in values = (meds | filter_missed:isMiss | orderBy:'time':true )">
+            <div class="list_item_container" id="{{ 'miss_comp-' + $index }}" ng-repeat="m in values = (static_meds | filter_missed:isMiss | orderBy:'time':true )">
               <div class="list_item">
                 <div class="time_info" ng-style="varying_colors($index, values.length)">{{m.time | cmdate:'h:mm:ss a'}}</div>
                 <div class="misc_info">{{m.name}}<br>{{m.dosage}}</div>
