@@ -149,31 +149,6 @@ angular.module('medicationReminderApp').controller('MainCtrl', function ($scope,
         }, 1500);
     }
 
-    var data = {
-      time: moment().subtract(55, 'seconds').subtract(4, 'minutes'),
-      completed: false,
-      d:{
-
-      }
-    }
-
-    $http({
-        method: 'PUT',
-        url: '/api/medications/57b6360aa141fb1988c436b6',
-        data: JSON.stringify(data)
-      })
-      .then(function (success) {
-      }, function (error) {
-        errorCallback(error.data);
-      });
-
-      $http.get('/api/medications?start=' + start + '&end=' + end).then(function (meds) {
-          $scope.meds = meds.data;
-          if($scope.meds.length == 0){
-            angular.element('#no_task').css('display', 'inline');
-          }
-      });
-
     $scope.ctr = 0;
     $scope.currentDate = "Today";
     $scope.isEnable = true;
